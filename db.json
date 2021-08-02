@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "id": 87950,
+      "text": "Bug Fix Accusentry",
+      "day": "4 Agustus 2021, 10:00 WIB",
+      "reminder": true
+    },
+    {
+      "id": 29152,
+      "text": "Vue Crash Course 2021",
+      "day": "2 Agustus 2021, 19:30 WIB",
+      "reminder": true
+    }
+  ]
+}

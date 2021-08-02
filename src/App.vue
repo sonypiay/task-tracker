@@ -43,32 +43,85 @@ export default {
     }
   },
   methods: {
-    defaultTasks()
+    async getListTasks(id)
     {
-      this.tasks = [];
+      let url     = id 
+      ? `api/tasks/${id}`
+      : 'api/tasks';
+
+      const res   = await fetch(url);
+
+      if( res.status === 200 )
+      {
+        const data  = await res.json();
+        this.tasks  = data;
+      }
     },
-    addTask(task)
+    async addTask(task)
     {
-      this.tasks = [...this.tasks, task];
+      const res = await fetch('api/tasks', {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(task),
+      });
+
+      if( res.status !== 201 )
+      {
+        const data  = await res.json();
+        this.tasks.push(data);
+      }
+      else
+      {
+        alert('There was an error when add new task.');
+      }
     },
-    deleteTask(id)
+    async deleteTask(id)
     {
       if( confirm('Are you sure want to delete this task?') )
       {
-        this.tasks  = this.tasks.filter( item => item.id !== id);
+        const res = await fetch(`api/tasks/${id}`, {
+          method: 'delete',
+        });
+
+        if( res.status === 200 )
+        {
+          this.tasks  = this.tasks.filter((item) => item.id !== id);
+        }
+        else
+        {
+          alert('There was an error when deleting task.');
+        }
       }
     },
-    toggleReminder(id)
+    async toggleReminder(id)
     {
-      this.tasks = this.tasks.map((item) => item.id === id ? {...item, reminder: !item.reminder} : item );
+      const getListTasks  = this.tasks.filter(item => item.id === id);
+      const updateTask    = getListTasks.length === 0 ? null : getListTasks[0];
+
+      if( updateTask ) updateTask.reminder = !updateTask.reminder;
+
+      const res = await fetch(`api/tasks/${id}`, {
+        method: 'put',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateTask)
+      });
+
+      if( res.status === 201 )
+      {
+        this.tasks  = this.tasks.map((item) => item.id === id ? {...item, reminder: updateTask.reminder} : item );
+      }
     },
     toggleAddTask()
     {
       this.showAddTask = !this.showAddTask;
     }
   },
-  created() {
-    this.defaultTasks();
+  mounted() {
+    this.getListTasks();
   },
   emits: ['add-task', 'toggle-add-task'],
 }
